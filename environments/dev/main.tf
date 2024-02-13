@@ -17,3 +17,8 @@ module "b3o_repository" {
   encryption_type      = "AES256"
   scan_on_push         = true
 }
+
+module "b3o_vpc" {
+  source   = "../../modules/vpc"
+  vpc_name = "b3o"
+}
