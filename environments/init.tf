@@ -4,7 +4,11 @@ provider "aws" {
 
 # S3 bucket for backend
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "b3o-tfstate"
+  bucket        = "b3o-tfstate"
+  force_destroy = true
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # S3 버킷에서 버전 관리를 제어하기 위한 리소스를 제공합니다.
