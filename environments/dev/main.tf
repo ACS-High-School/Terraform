@@ -22,3 +22,14 @@ module "b3o_vpc" {
   source   = "../../modules/vpc"
   vpc_name = "b3o"
 }
+
+module "b3o_db" {
+  source = "../../modules/rds"
+
+  db_username          = var.db_username
+  db_password          = var.db_password
+  ap_private_subnet_a  = module.b3o_vpc.database_subnets_cidr_blocks[0]
+  ap_private_subnet_c  = module.b3o_vpc.database_subnets_cidr_blocks[1]
+  db_subnet_group_name = module.b3o_vpc.db_subnet_group_name
+  db_vpc_id            = module.b3o_vpc.vpc_id
+}
