@@ -6,15 +6,11 @@ variable "db_password" {
   type    = string
 }
 
-variable "ap_private_subnet_a" {
-  type    = string
-}
-
-variable "ap_private_subnet_c" {
-  type    = string
-}
-
 variable "db_subnet_group_name" {
+  type    = string
+}
+
+variable "db_sg_id" {
   type    = string
 }
 
