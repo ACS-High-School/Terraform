@@ -1,7 +1,7 @@
 variable "db_username" {
-  type    = string
+  type = string
 }
 
 variable "db_password" {
-  type    = string
+  type = string
 }
