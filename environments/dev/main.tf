@@ -54,5 +54,7 @@ module "b3o_ec2" {
   jenkins_subnet_id = var.jenkins_subnet_id
 
   jenkins_vpc_security_group_id = var.jenkins_vpc_security_group_id
-
+  bastion_ami                   = var.bastion_ami
+  bastion_subent_id             = module.b3o_vpc.public_subnets[0]
+  bastion_vpc_security_group_id = module.b3o_sg.bastion_sg_id
 }
