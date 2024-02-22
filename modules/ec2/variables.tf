@@ -14,3 +14,13 @@ variable "jenkins_vpc_security_group_id" {
   type = string
 }
 
+variable "bastion_ami" {
+  type = string
+}
+variable "bastion_subent_id" {
+  type = string
+}
+
+variable "bastion_vpc_security_group_id" {
+  type = string
+}
