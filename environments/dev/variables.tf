@@ -22,3 +22,6 @@ variable "jenkins_vpc_security_group_id" {
   type = string
 }
 
+variable "bastion_ami" {
+  type = string
+}
