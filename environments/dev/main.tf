@@ -12,7 +12,7 @@ provider "aws" {}
 
 module "b3o_repository" {
   source               = "../../modules/ecr"
-  repository_names     = ["frontend", "backend"]
+  repository_names     = ["frontend", "backend", "fl"]
   image_tag_mutability = "MUTABLE"
   encryption_type      = "AES256"
   scan_on_push         = true
@@ -45,4 +45,16 @@ module "b3o_db" {
   db_subnet_group_name = module.b3o_vpc.db_subnet_group_name
   db_vpc_id            = module.b3o_vpc.vpc_id
   db_sg_id             = module.b3o_sg.db_sg_id
+}
+
+module "b3o_ec2" {
+  source            = "../../modules/ec2"
+  jenkins_eip_id    = var.jenkins_eip_id
+  jenkins_ami       = var.jenkins_ami
+  jenkins_subnet_id = var.jenkins_subnet_id
+
+  jenkins_vpc_security_group_id = var.jenkins_vpc_security_group_id
+  bastion_ami                   = var.bastion_ami
+  bastion_subent_id             = module.b3o_vpc.public_subnets[0]
+  bastion_vpc_security_group_id = module.b3o_sg.bastion_sg_id
 }
