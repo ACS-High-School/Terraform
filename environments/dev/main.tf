@@ -58,3 +58,12 @@ module "b3o_ec2" {
   bastion_subent_id             = module.b3o_vpc.public_subnets[0]
   bastion_vpc_security_group_id = module.b3o_sg.bastion_sg_id
 }
+
+module "b3o_eks" {
+  source          = "../../modules/eks"
+  cluster_name    = "b3o_eks"
+  cluster_version = "1.29"
+  vpc_id          = module.b3o_vpc.vpc_id
+  private_subnets = module.b3o_vpc.private_subnets
+  main_region = "ap-northeast-2"
+}
