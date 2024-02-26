@@ -23,6 +23,9 @@ resource "aws_instance" "jenkins_server" {
 
 resource "aws_eip" "bastion_eip" {
   instance = aws_instance.B3o_bastion.id
+  tags = {
+    Name = "B3o-Bastion"
+  }
 }
 
 resource "aws_instance" "B3o_bastion" {
