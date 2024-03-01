@@ -5,7 +5,7 @@ resource "aws_db_instance" "b3o_db" {
   max_allocated_storage = 40
 
   engine         = "mysql"
-  engine_version = "8.0.31"
+  engine_version = "8.0.35"
 
   identifier = "b3o-db"
   username   = var.db_username
@@ -26,12 +26,4 @@ resource "aws_db_instance" "b3o_db" {
   tags = {
     Name = "b3o-DB"
   }
-}
-
-resource "aws_db_instance" "replica_b3o_db" {
-  instance_class          = "db.t3.micro"
-  identifier              = "replica-b3o-db"
-  skip_final_snapshot     = true
-  backup_retention_period = 7
-  replicate_source_db     = aws_db_instance.b3o_db.identifier
 }
