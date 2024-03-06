@@ -39,6 +39,7 @@ module "eks" {
   cluster_version = var.cluster_version
 
   cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
   cluster_encryption_config       = {}
 
   cluster_addons = {
@@ -184,4 +185,42 @@ resource "helm_release" "alb-controller" {
     name  = "clusterName"
     value = var.cluster_name
   }
+}
+
+// monitoring namespace 추가
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+// prometheus, grafana 배포
+resource "helm_release" "prometheus" {
+  name       = "prometheus"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = "monitoring"
+
+  set {
+    name  = "grafana.adminPassword"
+    value = var.grafana_adminPassword
+  }
+
+  set {
+    name  = "grafana.adminUser"
+    value = var.grafana_adminUser
+  }
+}
+// efk namespace 추가
+resource "kubernetes_namespace" "efk" {
+  metadata {
+    name = "efk"
+  }
+}
+
+// fluentbit 배포
+resource "helm_release" "fluentbit" {
+  name       = "fluentbit"
+  repository = "https://fluent.github.io/helm-charts"
+  chart      = "fluent-bit"
+  namespace  = "efk"
 }
