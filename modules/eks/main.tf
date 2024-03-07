@@ -101,6 +101,31 @@ module "eks" {
       iam_role_name = "b3o-ng-role"
     }
   }
+
+  manage_aws_auth_configmap = true
+
+  aws_auth_users = [
+    {
+      userarn  = var.admin1_userarn
+      username = var.admin1_username
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = var.admin2_userarn
+      username = var.admin2_username
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = var.admin3_userarn
+      username = var.admin3_username
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = var.admin4_userarn
+      username = var.admin4_username
+      groups   = ["system:masters"]
+    },
+  ]
 }
 
 # 현재 계정 ID를 가져오기 위한 데이터 소스 선언
