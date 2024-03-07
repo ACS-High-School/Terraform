@@ -68,4 +68,12 @@ module "b3o_eks" {
   main_region           = "ap-northeast-2"
   grafana_adminPassword = var.grafana_adminPassword
   grafana_adminUser     = var.grafana_adminUser
+  admin1_userarn        = var.admin1_userarn
+  admin1_username       = var.admin1_username
+  admin2_userarn        = var.admin2_userarn
+  admin2_username       = var.admin2_username
+  admin3_userarn        = var.admin3_userarn
+  admin3_username       = var.admin3_username
+  admin4_userarn        = var.admin4_userarn
+  admin4_username       = var.admin4_username
 }
