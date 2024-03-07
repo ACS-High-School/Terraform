@@ -18,3 +18,10 @@ variable "main_region" {
   type = string
 }
 
+variable "grafana_adminPassword" {
+  type = string
+}
+variable "grafana_adminUser" {
+  type = string
+}
+

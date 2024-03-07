@@ -25,3 +25,10 @@ variable "jenkins_vpc_security_group_id" {
 variable "bastion_ami" {
   type = string
 }
+
+variable "grafana_adminPassword" {
+  type = string
+}
+variable "grafana_adminUser" {
+  type = string
+}
