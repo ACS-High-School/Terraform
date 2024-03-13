@@ -31,6 +31,20 @@ data "aws_ami" "b3o_eks_ami" {
   }
 }
 
+module "ebs_csi_irsa_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name             = "${module.eks.cluster_name}-ebs-csi"
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    ex = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
+}
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.21.0"
@@ -51,6 +65,10 @@ module "eks" {
     }
     vpc-cni = {
       most_recent = true
+    }
+    aws-ebs-csi-driver = {
+      most_recent              = true
+      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
   }
 
@@ -88,9 +106,9 @@ module "eks" {
 
       subnet_ids = var.private_subnets
 
-      min_size     = 1
-      max_size     = 1
-      desired_size = 1
+      min_size     = 2
+      max_size     = 5
+      desired_size = 3
 
       ami_id                     = data.aws_ami.b3o_eks_ami.id
       enable_bootstrap_user_data = true
@@ -126,126 +144,4 @@ module "eks" {
       groups   = ["system:masters"]
     },
   ]
-}
-
-# 현재 계정 ID를 가져오기 위한 데이터 소스 선언
-data "aws_caller_identity" "current" {}
-
-# Fetch EKS Cluster Details
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-}
-
-locals {
-  oidc_issuer_url   = replace(data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer, "https://", "")
-  oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_issuer_url}"
-}
-
-module "lb_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
-  role_name                              = "${module.eks.cluster_name}_eks_lb"
-  attach_load_balancer_controller_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = local.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
-    }
-  }
-}
-
-
-resource "kubernetes_service_account" "service-account" {
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-
-    labels = {
-      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
-      "app.kubernetes.io/component" = "controller"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn"               = module.lb_role.iam_role_arn
-      "eks.amazonaws.com/sts-regional-endpoints" = "true"
-    }
-  }
-}
-
-resource "helm_release" "alb-controller" {
-  name       = "aws-load-balancer-controller"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
-  depends_on = [
-    kubernetes_service_account.service-account
-  ]
-
-  set {
-    name  = "region"
-    value = var.main_region
-  }
-
-  set {
-    name  = "vpcId"
-    value = var.vpc_id
-  }
-
-  set {
-    name  = "image.repository"
-    value = "602401143452.dkr.ecr.${var.main_region}.amazonaws.com/amazon/aws-load-balancer-controller"
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  }
-
-  set {
-    name  = "clusterName"
-    value = var.cluster_name
-  }
-}
-
-// monitoring namespace 추가
-resource "kubernetes_namespace" "monitoring" {
-  metadata {
-    name = "monitoring"
-  }
-}
-// prometheus, grafana 배포
-resource "helm_release" "prometheus" {
-  name       = "prometheus"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
-
-  set {
-    name  = "grafana.adminPassword"
-    value = var.grafana_adminPassword
-  }
-
-  set {
-    name  = "grafana.adminUser"
-    value = var.grafana_adminUser
-  }
-}
-// efk namespace 추가
-resource "kubernetes_namespace" "efk" {
-  metadata {
-    name = "efk"
-  }
-}
-
-// fluentbit 배포
-resource "helm_release" "fluentbit" {
-  name       = "fluentbit"
-  repository = "https://fluent.github.io/helm-charts"
-  chart      = "fluent-bit"
-  namespace  = "efk"
 }
