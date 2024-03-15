@@ -120,10 +120,10 @@ resource "kubernetes_storage_class" "monitoring_storage_class" {
 }
 
 resource "helm_release" "prometheus" {
-  name       = "prometheus"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
+  name             = "prometheus"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "kube-prometheus-stack"
+  namespace        = "monitoring"
   create_namespace = true
 
   set {
@@ -138,10 +138,10 @@ resource "helm_release" "prometheus" {
 }
 
 resource "helm_release" "elasticsearch" {
-  name       = "elasticsearch"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "elasticsearch"
-  namespace = "efk"
+  name             = "elasticsearch"
+  repository       = "https://charts.bitnami.com/bitnami"
+  chart            = "elasticsearch"
+  namespace        = "efk"
   create_namespace = true
 
   set {
@@ -154,7 +154,7 @@ resource "helm_release" "elasticsearch" {
     value = "monitoring-storage-class"
   }
 
-   set {
+  set {
     name  = "master.replicas"
     value = "1"
   }
@@ -165,13 +165,13 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name = "master.persistence.size"
+    name  = "master.persistence.size"
     value = "4Gi"
   }
 
   set {
     name  = "coordinating.replicas"
-    value = "0" 
+    value = "0"
   }
 
   set {
@@ -180,7 +180,7 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name = "coordinating.persistence.size"
+    name  = "coordinating.persistence.size"
     value = "0Gi"
   }
 
@@ -195,7 +195,7 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name = "data.persistence.size"
+    name  = "data.persistence.size"
     value = "0Gi"
   }
 
@@ -205,39 +205,11 @@ resource "helm_release" "elasticsearch" {
   }
 }
 
-resource "helm_release" "fluent_bit" {
-  name       = "fluent-bit"
-  repository = "https://fluent.github.io/helm-charts"
-  chart      = "fluent-bit"
-  namespace  = "efk"
-  create_namespace = true  
-
-  set {
-    name  = "backend.type"
-    value = "es"
-  }
-
-  set {
-    name  = "backend.es.host"
-    value = "elasticsearch-master"
-  }
-
-  set {
-    name  = "backend.es.port"
-    value = "9200"
-  }
-
-  set {
-    name  = "backend.es.logstash_prefix"
-    value = "fluent-bit"
-  }
-}
-
 resource "helm_release" "argocd" {
-  name       = "argocd"
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = "argo-cd"
-  namespace  = "argocd"
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
   create_namespace = true
 }
 
