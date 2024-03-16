@@ -226,6 +226,12 @@ resource "helm_release" "metrics_server" {
   }
 }
 
+resource "helm_release" "kube_ops_view" {
+  namespace = "kube-system"
+  name       = "kube-ops-view"
+  repository = "https://stefanprodan.github.io/k8s-podinfo"
+  chart      = "podinfo"
+}
 resource "kubernetes_namespace" "web" {
   metadata {
     name = "web"
