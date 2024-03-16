@@ -213,6 +213,19 @@ resource "helm_release" "argocd" {
   create_namespace = true
 }
 
+resource "helm_release" "metrics_server" {
+  namespace        = "kube-system"
+  name             = "metrics-server"
+  chart            = "metrics-server"
+  version          = "3.8.2"
+  repository       = "https://kubernetes-sigs.github.io/metrics-server/"
+  
+  set {
+    name  = "replicas"
+    value = 2
+  }
+}
+
 resource "kubernetes_namespace" "web" {
   metadata {
     name = "web"
